@@ -1,7 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react'
+import Amplify, { API } from 'aws-amplify'
+import { withAuthenticator } from '@aws-amplify/ui-react'
+
+import awsconfig from './amplify.config'
+
+import logo from './logo.svg'
+import './App.css'
+
+Amplify.configure(awsconfig)
 
 function App() {
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    const fetchMessage = async () => {
+      const { message } = await API.get('BankingAPI', '/transactions')
+      setMessage(message)
+    }
+
+    fetchMessage()
+  }, [])
+
   return (
     <div className="App">
       <header className="App-header">
@@ -17,9 +36,12 @@ function App() {
         >
           Welcome to serverless
         </a>
+        {message && <div>{message}</div>}
       </header>
     </div>
   );
 }
 
-export default App;
+export default withAuthenticator(App, {
+  usernameAlias: 'email'
+})
