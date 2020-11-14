@@ -12,6 +12,7 @@ custom:
   s3Sync:
     - bucketName: ${self:custom.bucketName}
       localDir: build
+  
 
 provider:
   name: aws
@@ -114,14 +115,92 @@ resources:
     BICognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: BankingInsights
+        UserPoolName: banking-insights-user-pool
     BICognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: BankingInsightsWebApp
+        ClientName: banking-insights-user-pool-client
         GenerateSecret: false
         UserPoolId:
           Ref: BICognitoUserPool
+    BICognitoIdentityPool:
+      Type: AWS::Cognito::IdentityPool
+      Properties:
+        IdentityPoolName: banking-insights-identity-pool
+        AllowUnauthenticatedIdentities: false
+        CognitoIdentityProviders:
+          - ProviderName:
+              Fn::GetAtt: [BICognitoUserPool, ProviderName]
+            ClientId:
+              Ref: BICognitoUserPoolClient
+    BIAuthenticatedRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: banking-insights-authenticated-role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated:
+                  - 'cognito-identity.amazonaws.com'
+              Action: 'sts:AssumeRoleWithWebIdentity'
+        Policies:
+          - PolicyName: banking-insights-authenticated-policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'mobileanalytics:PutEvents'
+                    - 'cognito-sync:*'
+                    - 'cognito-identity:*'
+                  Resource:
+                    - '*'
+                - Effect: Allow
+                  Action:
+                    - 'execute-api:Invoke'
+                  Resource:
+                    - Fn::Join:
+                      - ''
+                      - - 'arn:aws:execute-api:'
+                        - Ref: 'AWS::Region'
+                        - ':*:'
+                        - Ref: ApiGatewayRestApi
+                        - '/*/*/*'
+    BIUnauthenticatedRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: banking-insights-unauthenticated-role
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated:
+                  - 'cognito-identity.amazonaws.com'
+              Action: 'sts:AssumeRoleWithWebIdentity'
+        Policies:
+          - PolicyName: banking-insights-authenticated-policy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'mobileanalytics:PutEvents'
+                    - 'cognito-sync:*'
+                  Resource:
+                    - '*'
+    IdentityPoolRoleAttachment:
+      Type: AWS::Cognito::IdentityPoolRoleAttachment
+      Properties:
+        IdentityPoolId: 
+          Ref: BICognitoIdentityPool
+        Roles:
+          'authenticated':
+            Fn::GetAtt: [BIAuthenticatedRole, Arn]
+          'unauthenticated':
+            Fn::GetAtt: [BIUnauthenticatedRole, Arn]
     WebsiteBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -152,11 +231,15 @@ resources:
     BICognitoUserPoolId:
       Description: 'Banking Insights Cognito User Pool Id'
       Value:
-        Ref: 'BICognitoUserPool'
+        Ref: BICognitoUserPool
     BICognitoUserPoolClientId:
       Description: 'Banking Insights Cognito User Pool Client Id'
       Value:
-        Ref: 'BICognitoUserPoolClient'
+        Ref: BICognitoUserPoolClient
+    BICognitoIdentityPoolId:
+      Description: 'Banking Insights Cognito Identity Pool Id'
+      Value:
+        Ref: BICognitoIdentityPool
     WebsiteUrl:
       Description: 'Banking Insights Website Url'
       Value:
