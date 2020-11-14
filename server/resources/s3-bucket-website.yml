@@ -1,0 +1,31 @@
+Resources:
+  WebsiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:custom.websiteBucketName}
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+  WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: WebsiteBucket
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: 'Allow'
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+            Resource:
+              Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: WebsiteBucket
+                  - '/*'
+Outputs:
+  WebsiteUrl:
+    Description: 'S3 Bucket  Website Url'
+    Value:
+      Fn::GetAtt: [WebsiteBucket, WebsiteURL]
