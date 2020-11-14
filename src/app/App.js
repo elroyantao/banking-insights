@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Amplify, { API } from 'aws-amplify'
-import { withAuthenticator } from '@aws-amplify/ui-react'
+import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react'
 
 import awsconfig from './amplify.config'
 
@@ -12,14 +12,10 @@ Amplify.configure(awsconfig)
 function App() {
   const [message, setMessage] = useState('')
 
-  useEffect(() => {
-    const fetchMessage = async () => {
-      const { message } = await API.get('BankingAPI', '/transactions')
-      setMessage(message)
-    }
-
-    fetchMessage()
-  }, [])
+  const fetchMessage = async () => {
+    const { message } = await API.get('BankingAPI', '/transactions')
+    setMessage(message)
+  }
 
   return (
     <div className="App">
@@ -36,7 +32,9 @@ function App() {
         >
           Welcome to serverless
         </a>
+        <button onClick={fetchMessage}>go fetch</button>
         {message && <div>{message}</div>}
+        <AmplifySignOut/>
       </header>
     </div>
   );

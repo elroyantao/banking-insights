@@ -57,7 +57,7 @@ functions:
           path: transactions
           method: get
           cors: true
-          # authorizer: aws_iam
+          authorizer: aws_iam
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -203,6 +203,24 @@ resources:
             Fn::GetAtt: [BIAuthenticatedRole, Arn]
           'unauthenticated':
             Fn::GetAtt: [BIUnauthenticatedRole, Arn]
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+            gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+    GatewayResponseDefault5XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+            gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_5XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
     WebsiteBucket:
       Type: AWS::S3::Bucket
       Properties:

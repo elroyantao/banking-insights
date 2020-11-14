@@ -8,7 +8,8 @@ const config = {
   API: {
     endpoints: [{
       name: 'BankingAPI',
-      endpoint: process.env.REACT_APP_API_ENDPOINTS
+      endpoint: process.env.REACT_APP_API_ENDPOINTS,
+      region: process.env.REACT_APP_REGION
     }]
   }
 }
