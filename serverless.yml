@@ -15,34 +15,51 @@ custom:
   cognitoAuthRoleName: ${self:custom.name}-${self:provider.stage}-auth-role
   cognitoUnAuthRoleName: ${self:custom.name}-${self:provider.stage}-unAuth-role
   websiteBucketName: ${self:custom.name}-${self:provider.stage}-elroy-antao
+  transactionTableName: ${self:custom.name}-${self:provider.stage}-transaction-2
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
   region: eu-west-2
-
+  iamRoleStatements:
+    - ${file(server/resources/dynamodb-policy.yml)}
+  environment:
+    transactionsTable: ${self:custom.transactionTableName}
+      
 # you can add packaging information here
 package:
-  exclude: # Specify the directories and files which should be excluded in the deployment package
-    - .git/**
-    - node_modules/**
-    - src/**
-    - public/**
-    - build/**
+  individually: true
+  # exclude: # Specify the directories and files which should be excluded in the deployment package
+  #   - .git/**
+  #   - node_modules/**
+  #   - src/**
+  #   - public/**
+  #   - build/**
 
 functions:
   GetTransactions:
-    handler: server/transactions.getTx
+    handler: server/handlers/getTransactions.main
     events:
       - http:
           path: transactions
           method: get
           cors: true
           authorizer: aws_iam
-
+  AddTransaction:
+    handler: server/handlers/createTransaction.main
+    events:
+      - http:
+          path: transactions
+          method: post
+          cors: true
+          authorizer: aws_iam
 resources:
   - ${file(server/resources/cognito-user-pool.yml)}
   - ${file(server/resources/cognito-identity-pool.yml)}
   - ${file(server/resources/api-gateway-errors.yml)}
   - ${file(server/resources/s3-bucket-website.yml)}
+  - ${file(server/resources/dynamodb-table.yml)}
+
+plugins:
+  - serverless-bundle
