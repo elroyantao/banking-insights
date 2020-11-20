@@ -1,4 +1,4 @@
-import { GROCERIES, SHOPPING, LEISURE, BILLS, TAKEAWAY, HOLIODAY, DRINKS, TRANSPORT, UTILITIES } from './transactionCategories'
+import { GROCERIES, SHOPPING, LEISURE, BILLS, TAKEAWAY, HOLIODAY, DRINKS, TRANSPORT, UTILITIES, INCOME } from './transactionCategories'
 
 export const amazonPrime = {
   merchant: 'Amazon Prime',
@@ -75,28 +75,43 @@ export const tfl = {
   category: TRANSPORT
 }
 
-export const thamesWater = {
+export const THAMES_WATER = {
   merchant: 'Thames Water',
   category: UTILITIES
 }
 
-const merchants = [
-  amazonPrime,
-  arcadia,
-  cdKeys,
-  ee,
-  jdSports,
-  netflix,
-  uberEats,
-  deliveroo,
-  lastMinute,
-  expedia,
-  opodo,
-  airBnb,
-  theHarp,
-  dolphinTavern,
-  tfl,
-  thamesWater
-]
+export const NATIONWIDE_BS = {
+  merchant: 'Nationwide Banking Society',
+  category: INCOME
+}
 
-export default merchants
+export const BT_WIFI = {
+  merchant: 'BT internet',
+  category: BILLS
+}
+
+export const E_ON = {
+  merchant: 'e-on energy',
+  category: UTILITIES
+}
+
+// const merchants = [
+//   amazonPrime,
+//   arcadia,
+//   cdKeys,
+//   ee,
+//   jdSports,
+//   netflix,
+//   uberEats,
+//   deliveroo,
+//   lastMinute,
+//   expedia,
+//   opodo,
+//   airBnb,
+//   theHarp,
+//   dolphinTavern,
+//   tfl,
+//   thamesWater
+// ]
+
+// export default merchants

@@ -16,6 +16,7 @@ export const GENERAL = 'general'
 export const GIFTS = 'gifts'
 export const DRINKS = 'drinks'
 export const BILLS = 'bills'
+export const INCOME = 'income'
 
 const categories = [
   INVESTMENT,
